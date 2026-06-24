@@ -16,7 +16,9 @@ import java.nio.charset.StandardCharsets;
 @WebServlet("/servlet-main")
 public class ServletMain extends HttpServlet {
 
-    private static final Logger log = LogManager.getLogger(ServletMain.class);
+    private static final Logger log202 = LogManager.getLogger("PRERESERVA");
+    private static final Logger log3 = LogManager.getLogger("CONFIRM");
+    private static final Logger logApp = LogManager.getLogger(ServletMain.class);
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -24,12 +26,11 @@ public class ServletMain extends HttpServlet {
             throws ServletException, IOException {
         
 
-        log.info(
-                System.getProperty("Log4jContextSelector")
-        );
-        log.info(
-                LogManager.getContext(false).getClass().getName()
-        );
+        log202.info(System.getProperty("Log4jContextSelector"));
+        log202.info(LogManager.getContext(false).getClass().getName());
+
+        log3.info("Confirm!!");
+        logApp.info("Serving request");
 
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

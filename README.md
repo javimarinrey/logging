@@ -45,8 +45,11 @@ Para que todos tus loggers pasen a ser asíncronos por defecto, debes establecer
 Propiedad del sistema:
 
 ```
-
 -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
 -Dlog4j2.debug=true
+```
+## Log de consola solo en entorno DEV
 
+```
+-Denv=DEV
 ```
