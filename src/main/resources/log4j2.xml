@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    log4j2.xml — Configuración de logging asíncrono
+    Modo ALL_ASYNC: todos los loggers son async por defecto (requiere LMAX Disruptor en classpath).
+    Ninguna llamada a log.xxx() bloquea el hilo del servlet.
+-->
+<Configuration status="TRACE" monitorInterval="60">
+
+    <Properties>
+        <Property name="LOG_DIR">/home/javi/logs</Property>
+        <Property name="APP_LOG">${LOG_DIR}/app.log</Property>
+        <Property name="ERROR_LOG">${LOG_DIR}/error.log</Property>
+
+        <!-- Patrón para logs de aplicación -->
+        <Property name="PATTERN_APP">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} — %msg%n%xEx
+        </Property>
+
+        <!-- Patrón para access log: una línea, sin stacktrace -->
+        <Property name="PATTERN_ACCESS">%msg%n</Property>
+    </Properties>
+
+    <Appenders>
+
+        <!-- ── Consola (desarrollo / stdout de Tomcat) ── -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN_APP}"/>
+        </Console>
+
+        <!-- ── Log principal de la aplicación (rolling diario + por tamaño) ── -->
+        <RollingFile name="AppFile"
+                     fileName="${APP_LOG}"
+                     filePattern="${LOG_DIR}/app-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${PATTERN_APP}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- ── Error log separado para facilitar alertas ── -->
+        <RollingFile name="ErrorFile"
+                     fileName="${ERROR_LOG}"
+                     filePattern="${LOG_DIR}/error-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${PATTERN_APP}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <!-- ── Logger exclusivo para el access log ── -->
+        <!-- Additivity=false: no propaga al root, solo va a AccessFile -->
+        <!--<AsyncLogger name="com.hotusa.logging.XmlLogger"
+                     level="INFO"
+                     additivity="false">
+            <AppenderRef ref="XmlFile"/>
+        </AsyncLogger>-->
+
+        <!-- ── Silenciar loggers verbosos de librerías ── -->
+        <!--<AsyncLogger name="com.zaxxer.hikari" level="WARN" additivity="false">
+            <AppenderRef ref="AppFile"/>
+        </AsyncLogger>
+        <AsyncLogger name="org.mongodb.driver" level="WARN" additivity="false">
+            <AppenderRef ref="AppFile"/>
+        </AsyncLogger>
+        <AsyncLogger name="redis.clients.jedis" level="WARN" additivity="false">
+            <AppenderRef ref="AppFile"/>
+        </AsyncLogger>-->
+
+        <!-- ── Root logger — captura todo lo que no tenga logger propio ── -->
+        <!--
+            ALL_ASYNC se activa con la propiedad de sistema:
+            -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+            Añadir en CATALINA_OPTS de Tomcat.
+        -->
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AppFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </AsyncRoot>
+
+    </Loggers>
+
+</Configuration>
