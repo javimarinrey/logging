@@ -47,5 +47,6 @@ Propiedad del sistema:
 ```
 
 -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+-Dlog4j2.debug=true
 
 ```
