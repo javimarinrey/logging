@@ -4,7 +4,7 @@
     Modo ALL_ASYNC: todos los loggers son async por defecto (requiere LMAX Disruptor en classpath).
     Ninguna llamada a log.xxx() bloquea el hilo del servlet.
 -->
-<Configuration status="TRACE" monitorInterval="60">
+<Configuration status="WARN" monitorInterval="60">
 
     <Properties>
         <Property name="LOG_DIR">/home/javi/logs</Property>
@@ -21,6 +21,22 @@
     </Properties>
 
     <Appenders>
+
+        <Routing name="RoutingAppender">
+            <Routes pattern="$${ctx:requestId}">
+                <Route>
+                    <File name="File-${ctx:requestId}" fileName="${LOG_DIR}/request-${ctx:requestId}.log" append="true">
+                        <PatternLayout pattern="%d{ISO8601} [%t] %-5p %c{1} - %m%n"/>
+                    </File>
+                </Route>
+                <Route key="null">
+                    <File name="MainLog" fileName="${LOG_DIR}/general.log" append="true">
+                        <PatternLayout pattern="%d{ISO8601} [%t] %-5p %c{1} - %m%n"/>
+                    </File>
+                </Route>
+            </Routes>
+        </Routing>
+
 
         <!-- ── Consola (desarrollo / stdout de Tomcat) ── -->
         <Console name="Console" target="SYSTEM_OUT">
@@ -85,6 +101,7 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="AppFile"/>
             <AppenderRef ref="ErrorFile"/>
+            <AppenderRef ref="RoutingAppender"/>
         </AsyncRoot>
 
     </Loggers>

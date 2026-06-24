@@ -22,15 +22,7 @@ public class ServletMain extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
             throws ServletException, IOException {
-
-
-        /*int numLogs = 100000000;
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i < numLogs; i++) {
-            log.info("Log de prueba numero {} - Datos simulados: {}", i, "contenido extenso...");
-        }
-        long endTime = System.currentTimeMillis();
-        log.info("Tiempo total para " + numLogs + " logs: " + (endTime - startTime) + " ms");*/
+        
 
         log.info(
                 System.getProperty("Log4jContextSelector")
